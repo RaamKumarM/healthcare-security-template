@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HealthcareSocMetrics",
+  "type": "object",
+  "properties": {
+    "activeVendors": { "type": "number" },
+    "endpointHealth": { "type": "number" },
+    "threatsBlocked": { "type": "number" },
+    "hipaaScore": { "type": "number" },
+    "timeseries": { "type": "array" }
+  },
+  "required": ["activeVendors", "endpointHealth", "threatsBlocked", "hipaaScore"]
+}

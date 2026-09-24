@@ -1,0 +1,9 @@
+# Approved Dependencies for OpenCode & Developers
+approved_packages:
+  npm:
+    - name: "next"
+    - name: "react"
+    - name: "react-dom"
+    - name: "tailwindcss"
+    - name: "lucide-react"
+    - name: "recharts"

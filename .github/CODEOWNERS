@@ -1,0 +1,12 @@
+# CODEOWNERS — security-team review required on sensitive paths
+#
+# Syntax: <pattern> <owner(s)>
+# Patterns are evaluated last-match-wins; keep the catch-all (if any) first
+# and the sensitive-path rules last so they cannot be overridden.
+# Agents are forbidden from editing this file (see AGENTS.md); changes require
+# a human maintainer commit with security-team approval.
+
+# Security-sensitive paths — mandatory security-team review.
+.github/**              @security-team
+.gitleaks.toml         @security-team
+policies/**            @security-team

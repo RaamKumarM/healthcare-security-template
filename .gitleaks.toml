@@ -1,0 +1,22 @@
+title = "Healthcare Supply Chain Gitleaks Configuration"
+
+[allowlist]
+description = "Global allowlist"
+paths = [
+  '''dashboard/components/lib/mockSecurityFeed\.js'''
+]
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)(api_key|apikey|secret|token)\s*[:=]\s*["']([A-Za-z0-9_\-]{16,})["']'''
+
+[[rules]]
+id = "db-connection-string"
+description = "Database Connection String"
+regex = '''(?i)(postgres|mysql|mongodb|mssql):\/\/[^\s"']+'''
+
+[[rules]]
+id = "phi-identifier-leak"
+description = "PHI or Patient ID Pattern Leak"
+regex = '''(?i)(mrn|ssn|patient_id)\s*[:=]\s*["']?\d{3}-\d{2}-\d{4}["']?'''
