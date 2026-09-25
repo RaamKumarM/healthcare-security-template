@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HealthcareSocEntities",
+  "description": "Phase 2 data contracts. Stub/mock data only; no live systems access.",
+  "definitions": {
+    "Vendor": {
+      "type": "object",
+      "required": ["id", "name", "riskLevel", "status", "endpoints", "lastScanned"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "riskLevel": { "enum": ["Low", "Medium", "High"] },
+        "status": { "enum": ["Monitored", "Review", "Quarantined"] },
+        "endpoints": { "type": "integer", "minimum": 0 },
+        "lastScanned": { "type": "string", "format": "date-time" },
+        "severity": { "enum": ["Low", "Medium", "High"] }
+      }
+    },
+    "NetworkSegment": {
+      "type": "object",
+      "required": ["vlanId", "name", "endpoints", "health"],
+      "properties": {
+        "vlanId": { "type": "string" },
+        "name": { "type": "string" },
+        "endpoints": { "type": "integer", "minimum": 0 },
+        "health": { "enum": ["Healthy", "Isolated", "Degraded"] },
+        "severity": { "enum": ["Low", "Medium", "High"] }
+      }
+    },
+    "SecurityMetrics": {
+      "type": "object",
+      "required": ["threatsBlocked", "activeVendors", "hipaaScore", "endpointHealth"],
+      "properties": {
+        "threatsBlocked": { "type": "number" },
+        "activeVendors": { "type": "number" },
+        "hipaaScore": { "type": "number" },
+        "endpointHealth": { "type": "number" },
+        "timeseries": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/ThreatEvent" }
+        }
+      }
+    },
+    "ThreatEvent": {
+      "type": "object",
+      "required": ["timestamp", "count", "severity", "category"],
+      "properties": {
+        "timestamp": { "type": "string" },
+        "count": { "type": "integer", "minimum": 0 },
+        "severity": { "enum": ["Low", "Medium", "High"] },
+        "category": { "enum": ["intrusion", "malware", "egress", "dependency"] }
+      }
+    },
+    "RotateKeysPayload": {
+      "type": "object",
+      "properties": {
+        "scope": { "type": "string", "default": "administrative" },
+        "reason": { "type": "string" }
+      }
+    },
+    "AccessUpdatePayload": {
+      "type": "object",
+      "required": ["subject", "role"],
+      "properties": {
+        "subject": { "type": "string" },
+        "role": { "type": "string" },
+        "action": { "enum": ["grant", "revoke"], "default": "grant" }
+      }
+    },
+    "PolicyAuditPayload": {
+      "type": "object",
+      "properties": {
+        "framework": { "enum": ["hipaa", "cpg", "both"], "default": "both" }
+      }
+    },
+    "ReportRequestPayload": {
+      "type": "object",
+      "required": ["format"],
+      "properties": {
+        "format": { "enum": ["json", "csv"] },
+        "scope": { "enum": ["vendors", "segments", "metrics"], "default": "vendors" }
+      }
+    }
+  }
+}

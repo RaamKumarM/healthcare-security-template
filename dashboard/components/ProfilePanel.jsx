@@ -1,20 +1,51 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { MessageSquare, Bell, User, ChevronRight, Target, CalendarCheck, Settings } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 /**
  * Right profile rail with gauge (reference: profile panel + Project Status gauge).
- * @param {{ vendors: number, blocked: number, score: number }} props
+ * @param {{ vendors: number, blocked: number, score: number, onNavigate: (id: string) => void }} props
  */
 
 const LINKS = [
-  { label: "Playbooks", icon: Target, tint: "bg-indigo-50 text-indigo-700" },
-  { label: "Compliance Plan", icon: CalendarCheck, tint: "bg-rose-50 text-rose-500" },
-  { label: "Settings", icon: Settings, tint: "bg-orange-50 text-orange-500" },
+  { label: "Pending Reviews", target: "reviews", icon: Target, tint: "bg-indigo-50 text-indigo-700" },
+  { label: "Compliance Plan", target: "audit", icon: CalendarCheck, tint: "bg-rose-50 text-rose-500" },
+  { label: "Settings", target: "settings", icon: Settings, tint: "bg-orange-50 text-orange-500" },
 ];
 
-export default function ProfilePanel({ vendors, blocked, score }) {
+export default function ProfilePanel({ vendors, blocked, score, onNavigate }) {
+  const [popup, setPopup] = useState(null);
+  const toggle = (p) => setPopup((cur) => (cur === p ? null : p));
+  // Notification dot clears once the bell popup has been opened (persisted).
+  const [unread, setUnread] = useState(true);
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem("soc-bell-read") === "1") setUnread(false);
+    } catch {
+      /* private mode */
+    }
+  }, []);
+  const openBell = () => {
+    toggle("bell");
+    setUnread(false);
+    try {
+      window.localStorage.setItem("soc-bell-read", "1");
+    } catch {
+      /* noop */
+    }
+  };
+
+  const MESSAGES = [
+    { from: "SOC Bot", text: "Nightly scan finished — 142 threats blocked." },
+    { from: "CareCloud", text: "Endpoint review requested for 9 nodes." },
+  ];
+  const NOTICES = [
+    { text: "Blocked outbound connection to untrusted host", time: "2m ago" },
+    { text: "New vendor endpoint awaiting review", time: "1h ago" },
+    { text: "HPH CPG policy check completed", time: "3h ago" },
+  ];
   const gauge = [
     { name: "passing", value: 132 },
     { name: "rest", value: 11 },
@@ -22,17 +53,78 @@ export default function ProfilePanel({ vendors, blocked, score }) {
 
   return (
     <aside aria-label="Profile panel" className="flex w-60 shrink-0 flex-col gap-4 px-4 py-5">
-      <div className="flex items-center justify-end gap-2">
-        <button type="button" aria-label="Messages" className="rounded-lg bg-white p-2 text-slate-400 shadow-sm hover:text-orange-500">
+      <div className="relative flex items-center justify-end gap-2">
+        <button type="button" aria-label="Messages" onClick={() => toggle("messages")} className="rounded-lg bg-white p-2 text-slate-400 shadow-sm hover:text-orange-500">
           <MessageSquare size={16} />
         </button>
-        <button type="button" aria-label="Notifications" className="relative rounded-lg bg-white p-2 text-slate-400 shadow-sm hover:text-orange-500">
+        <button type="button" aria-label="Notifications" onClick={openBell} className="relative rounded-lg bg-white p-2 text-slate-400 shadow-sm hover:text-orange-500">
           <Bell size={16} />
-          <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-orange-500" />
+          {unread && <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-orange-500" />}
         </button>
-        <button type="button" aria-label="Profile" className="rounded-lg bg-white p-2 text-slate-400 shadow-sm hover:text-orange-500">
+        <button type="button" aria-label="Profile" onClick={() => toggle("user")} className="rounded-lg bg-white p-2 text-slate-400 shadow-sm hover:text-orange-500">
           <User size={16} />
         </button>
+        {popup && (
+          <>
+            <button
+              type="button"
+              aria-label="Close popup"
+              onClick={() => setPopup(null)}
+              className="fixed inset-0 z-40 cursor-default"
+            />
+            <div className="absolute right-0 top-11 z-50 w-64 rounded-xl border border-slate-200 bg-white p-3 shadow-xl">
+              {popup === "messages" && (
+                <>
+                  <p className="mb-2 text-[12px] font-bold text-slate-800">Messages</p>
+                  <ul className="flex flex-col gap-2">
+                    {MESSAGES.map((m) => (
+                      <li key={m.from} className="rounded-lg bg-slate-50 px-2.5 py-2">
+                        <p className="text-[12px] font-semibold text-slate-700">{m.from}</p>
+                        <p className="text-[12px] text-slate-500">{m.text}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              {popup === "bell" && (
+                <>
+                  <p className="mb-2 text-[12px] font-bold text-slate-800">Notifications</p>
+                  <ul className="flex flex-col gap-2">
+                    {NOTICES.map((n) => (
+                      <li key={n.text} className="rounded-lg bg-slate-50 px-2.5 py-2">
+                        <p className="text-[12px] text-slate-700">{n.text}</p>
+                        <p className="text-[11px] text-slate-400">{n.time} · stub</p>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              {popup === "user" && (
+                <>
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500 text-[12px] font-bold text-white">
+                      SO
+                    </span>
+                    <span>
+                      <span className="block text-[13px] font-bold text-slate-800">SecOps</span>
+                      <span className="block text-[11px] text-slate-400">Security Analyst</span>
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPopup(null);
+                      onNavigate("settings");
+                    }}
+                    className="mt-2.5 w-full rounded-lg bg-slate-900 px-3 py-2 text-[12px] font-semibold text-white hover:bg-slate-700"
+                  >
+                    Open Settings
+                  </button>
+                </>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Avatar with progress ring */}
@@ -78,6 +170,7 @@ export default function ProfilePanel({ vendors, blocked, score }) {
           <button
             key={l.label}
             type="button"
+            onClick={() => onNavigate(l.target)}
             className="flex items-center gap-2.5 rounded-xl bg-white/60 px-2 py-1.5 hover:bg-white"
           >
             <span className={`flex h-9 w-9 items-center justify-center rounded-full ${l.tint}`}>

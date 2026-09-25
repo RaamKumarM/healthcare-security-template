@@ -14,8 +14,8 @@ import {
 } from "lucide-react";
 
 /**
- * Left navigation rail (reference: analytics sidebar).
- * @param {{ active: string, onNavigate: (id: string) => void }} props
+ * Left navigation rail (reference: analytics sidebar). All controls functional.
+ * @param {{ active: string, onNavigate: (id: string) => void, theme: string, onTheme: (t: string) => void, onAddVendor: () => void, onWorkspaceInfo: () => void }} props
  */
 
 const MENU = [
@@ -23,7 +23,7 @@ const MENU = [
   { id: "alerts", label: "Alerts", icon: Inbox },
   { id: "vendors", label: "Vendors", icon: Building2 },
   { id: "threats", label: "Threat Intel", icon: Flame },
-  { id: "reviews", label: "Reviews", icon: CalendarCheck, badge: "5" },
+  { id: "reviews", label: "Reviews", icon: CalendarCheck },
 ];
 
 const SYSTEM = [
@@ -31,7 +31,7 @@ const SYSTEM = [
   { id: "audit", label: "Audit Log", icon: ScrollText },
 ];
 
-export default function NavRail({ active, onNavigate }) {
+export default function NavRail({ active, onNavigate, theme, onTheme, onAddVendor, onWorkspaceInfo, reviewCount = 0 }) {
   const item = (l) => {
     const isActive = active === l.id;
     return (
@@ -45,9 +45,9 @@ export default function NavRail({ active, onNavigate }) {
       >
         <l.icon size={16} className="shrink-0" />
         <span className="flex-1 text-left">{l.label}</span>
-        {l.badge && (
+        {l.id === "reviews" && reviewCount > 0 && (
           <span className="rounded bg-orange-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-            {l.badge}
+            {reviewCount}
           </span>
         )}
       </button>
@@ -72,7 +72,9 @@ export default function NavRail({ active, onNavigate }) {
         <p className="mb-1 text-[11px] text-slate-400">Teams</p>
         <button
           type="button"
-          className="flex w-full items-center justify-between rounded-lg border border-slate-200 px-2.5 py-2 text-[13px] text-slate-700"
+          onClick={onWorkspaceInfo}
+          title="Workspace info"
+          className="flex w-full items-center justify-between rounded-lg border border-slate-200 px-2.5 py-2 text-[13px] text-slate-700 hover:border-orange-300"
         >
           Healthcare SOC
           <span className="text-slate-400">↕</span>
@@ -93,6 +95,7 @@ export default function NavRail({ active, onNavigate }) {
       {/* Add vendor card */}
       <button
         type="button"
+        onClick={onAddVendor}
         className="flex flex-col items-center gap-1 rounded-xl border border-dashed border-slate-300 px-3 py-5 text-slate-500 hover:border-orange-400 hover:text-orange-500"
       >
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 text-white">
@@ -102,14 +105,26 @@ export default function NavRail({ active, onNavigate }) {
         <span className="text-[11px]">or review invite link</span>
       </button>
 
-      {/* Dark / Light stub */}
+      {/* Dark / Light toggle */}
       <div className="mt-auto flex items-center gap-2 text-[12px]">
-        <span className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-slate-400">
+        <button
+          type="button"
+          onClick={() => onTheme("dark")}
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 ${
+            theme === "dark" ? "bg-slate-900 font-semibold text-white shadow" : "text-slate-400 hover:bg-slate-100"
+          }`}
+        >
           <Moon size={14} /> Dark
-        </span>
-        <span className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-white px-2 py-2 font-semibold text-slate-800 shadow">
+        </button>
+        <button
+          type="button"
+          onClick={() => onTheme("light")}
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 ${
+            theme === "light" ? "bg-white font-semibold text-slate-800 shadow" : "text-slate-400 hover:bg-slate-100"
+          }`}
+        >
           <Sun size={14} /> Light
-        </span>
+        </button>
       </div>
     </aside>
   );

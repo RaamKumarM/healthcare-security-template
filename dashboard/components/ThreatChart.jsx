@@ -13,7 +13,7 @@ import {
 
 /**
  * Threat activity combo chart (orange bars + indigo line) with side mini tiles.
- * @param {{ data: { time: string, threats: number, scans: number }[] }} props
+ * @param {{ data: { time: string, threats: number, scans: number }[], blocked?: number, endpoints?: number }} props
  */
 
 const TILES = [
@@ -22,19 +22,19 @@ const TILES = [
   { label: "MTTR", value: "26m" },
 ];
 
-export default function ThreatChart({ data }) {
+export default function ThreatChart({ data, blocked = 142, endpoints = 87 }) {
   return (
     <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
       <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-[0_2px_12px_rgba(15,23,42,0.05)]">
         <div className="flex flex-wrap gap-6 text-[12px] text-slate-400">
           <span>
-            Threats blocked <span className="block text-[15px] font-bold text-slate-800">142</span>
+            Threats blocked <span className="block text-[15px] font-bold text-slate-800">{blocked}</span>
           </span>
           <span>
             Period <span className="block text-[15px] font-bold text-slate-800">24 hours</span>
           </span>
           <span>
-            Vendor endpoints <span className="block text-[15px] font-bold text-slate-800">87</span>
+            Vendor endpoints <span className="block text-[15px] font-bold text-slate-800">{endpoints}</span>
           </span>
         </div>
         <div className="mt-2 h-56">

@@ -28,3 +28,6 @@ Thumbs.db
 !.vscode/launch.json
 !.vscode/extensions.json
 .idea/
+
+# Local runtime database (auto-seeds from mock datasets)
+data/*.json

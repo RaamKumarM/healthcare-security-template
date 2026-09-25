@@ -15,3 +15,14 @@ table {
 ::selection {
   background-color: #ffedd5;
 }
+
+/*
+ * Dark mode: luminance-inverted shell (hue-preserving via paired hue-rotate,
+ * so brand oranges/indigos keep their hue). Scoped to the main app shell —
+ * floating overlays (drawer, modals, toasts) intentionally keep the light
+ * "elevated surface" treatment.
+ */
+.dark-scheme {
+  filter: invert(0.9) hue-rotate(180deg);
+  color-scheme: dark;
+}
